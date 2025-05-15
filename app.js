@@ -11,6 +11,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
+// Importar rutas
+const userRoutes = require('./routes/user.routes');
+
+// Usar rutas
+app.use('/api', userRoutes);
+
 // Ruta de prueba
 app.get('/test', (req, res) => {
     return res.status(200).json({
