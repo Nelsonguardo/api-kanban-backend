@@ -15,7 +15,7 @@ const createToken = (user) => {
         role: user.role,
         created_at: user.created_at,
         iat: moment().unix(),
-        exp: moment().add(process.env.JWT_EXPIRATION || '24h').unix()
+        exp: moment().add(process.env.JWT_EXPIRATION, 'days').unix()
     };
     //Devolver el token
     return jwt.encode(payload, secret);

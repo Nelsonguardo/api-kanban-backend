@@ -30,6 +30,7 @@ exports.auth = (req, res, next) => {
         //agregar datos al request
         req.user = payload;
     } catch (error) {
+        console.log(error);
         return res.status(404).send({
             status: 'error',
             message: 'Token invalido',
