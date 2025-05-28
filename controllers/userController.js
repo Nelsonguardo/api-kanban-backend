@@ -74,45 +74,170 @@ class UserController {
     }
 
     async Login(req, res) {
-        //Recoger los datos de la peticion
-        let params = req.body;
-        //Revisar si faltan datos
-        if (!params.email || !params.password) {
-            return res.status(400).json({
+        try {
+            //Recoger los datos de la peticion
+            let params = req.body;
+            //Revisar si faltan datos
+            if (!params.email || !params.password) {
+                return res.status(400).json({
+                    status: 'error',
+                    message: 'Faltan datos requeridos'
+                });
+            }
+            // comprobar si el usuario existe
+            const user = await userService.getUserByEmail(params.email);
+            if (!user) {
+                return res.status(400).json({
+                    status: 'error',
+                    message: 'Usuario no existe'
+                });
+            }
+            // comprobar la password
+            const pwd = bcrypt.compareSync(params.password, user.password);
+            if (!pwd) {
+                return res.status(400).send({
+                    status: "error",
+                    message: "La password es incorrecta"
+                })
+            }
+            //Devolver token
+            const token = jwt.createToken(user);
+            //Devolver datos del usuario
+            return res.status(200).send({
+                status: "success",
+                message: "Usuario logueado correctamente",
+                user: {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role
+                },
+                token
+            });
+        } catch (error) {
+            return res.status(500).json({
                 status: 'error',
-                message: 'Faltan datos requeridos'
+                message: error.message
             });
         }
-        // comprobar si el usuario existe
-        const user = await userService.getUserByEmail(params.email);
-        if (!user) {
-            return res.status(400).json({
+    }
+    async getAllUsers(req, res) {
+        try {
+            const users = await userService.getAllUsers();
+            if (!users || users.length === 0) {
+                return res.status(404).json({
+                    status: 'error',
+                    message: 'No se encontraron usuarios'
+                });
+            }
+            return res.status(200).json({
+                status: 'success',
+                users
+            });
+        } catch (error) {
+            return res.status(500).json({
                 status: 'error',
-                message: 'Usuario no existe'
+                message: error.message
             });
         }
-        // comprobar la password
-        const pwd = bcrypt.compareSync(params.password, user.password);
-        if (!pwd) {
-            return res.status(400).send({
-                status: "error",
-                message: "La password es incorrecta"
-            })
+    }
+
+    async updateUser(req, res) {
+        try {
+            const { id } = req.params;
+            let params = req.body;
+
+            // Validar que existe el ID
+            if (!id) {
+                return res.status(400).json({
+                    status: 'error',
+                    message: 'ID de usuario no proporcionado'
+                });
+            }
+
+            // Verificar que el usuario a actualizar existe
+            const user = await userService.getUserById(id);
+            if (!user) {
+                return res.status(404).json({
+                    status: 'error',
+                    message: 'Usuario no encontrado'
+                });
+            }
+
+            // Solo verificar email si se está intentando actualizar
+            if (params.email) {
+                // Buscar si el email existe en la base de datos
+                const existingUser = await userService.getUserByEmail(params.email);
+
+                // Si existe un usuario con ese email Y no es el mismo que estamos actualizando
+                if (existingUser && existingUser.id !== parseInt(id)) {
+                    return res.status(409).json({
+                        status: 'error',
+                        message: 'El correo ya está en uso por otro usuario'
+                    });
+                }
+            }
+                       
+            const userUpdated = await userService.updateUser({ ...params, id });
+
+            if (!userUpdated) {
+                return res.status(404).json({
+                    status: 'error',
+                    message: 'No se pudo actualizar el usuario'
+                });
+            }
+
+            return res.status(200).json({
+                status: 'success',
+                user: userUpdated
+            });
+        } catch (error) {
+            return res.status(500).json({
+                status: 'error',
+                message: error.message,
+            });
         }
-        //Devolver token
-        const token = jwt.createToken(user);
-        //Devolver datos del usuario
-        return res.status(200).send({
-            status: "success",
-            message: "Usuario logueado correctamente",
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role
-            },
-            token
-        });
+    }
+
+    async deleteUser(req, res) {
+        try {
+            const { id } = req.params;
+
+            // Validar que existe el ID
+            if (!id) {
+                return res.status(400).json({
+                    status: 'error',
+                    message: 'ID de usuario no proporcionado'
+                });
+            }
+
+            // Verificar que el usuario a eliminar existe
+            const user = await userService.getUserById(id);
+            if (!user) {
+                return res.status(404).json({
+                    status: 'error',
+                    message: 'Usuario no encontrado'
+                });
+            }
+
+            await userService.deleteUser(id);
+            if (!user) {
+                return res.status(404).json({
+                    status: 'error',
+                    message: 'No se pudo eliminar el usuario'
+                });
+            }
+
+            return res.status(200).json({
+                status: 'success',
+                message: 'Usuario eliminado correctamente'
+            });
+        } catch (error) {
+            return res.status(500).json({
+                status: 'error',
+                message: error.message
+            });
+        }
     }
 }
 

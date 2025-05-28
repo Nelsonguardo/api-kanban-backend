@@ -1,43 +1,46 @@
-//Importar modulos
 const jwt = require('jwt-simple');
 const moment = require('moment');
+const { secret } = require('../utils/jwt');
 
-//importar clave secreta
-const libjwt = require('../utils/jwt');
-const secret = libjwt.secret;
-
-//funcion de autenticacion
 exports.auth = (req, res, next) => {
-    //comprobar si me llega la cabezera de autenticacion
-    if (!req.headers.authorization) {
-        return res.status(403).send({
-            status: 'error',
-            message: 'La peticion no tiene la cabecera de autenticacion'
-        });
-    }
-    //limpiar el token
-    let token = req.headers.authorization.replace(/['"]+/g, '');
-    //decodificar el token
     try {
-        let payload = jwt.decode(token, secret);
-        //comprobar si el token ha expirado
-        if (payload.exp <= moment().unix()) {
-            return res.status(401).send({
+        // Verificar si existe el header
+        if (!req.headers.authorization) {
+            return res.status(401).json({
                 status: 'error',
-                message: 'El token ha expirado'
+                message: 'No se proporcionó token de autenticación'
             });
         }
-        //agregar datos al request
-        req.user = payload;
+
+        // Obtener el token y limpiar comillas si existen
+        const token = req.headers.authorization.replace(/['"]+/g, '');
+
+        try {
+            // Decodificar token
+            const payload = jwt.decode(token, secret);
+
+            // Verificar expiración
+            if (payload.exp <= moment().unix()) {
+                return res.status(401).json({
+                    status: 'error',
+                    message: 'El token ha expirado'
+                });
+            }
+
+            // Agregar datos del usuario al request
+            req.user = payload;
+            next();
+
+        } catch (error) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'Token inválido o malformado'
+            });
+        }
     } catch (error) {
-        console.log(error);
-        return res.status(404).send({
+        return res.status(500).json({
             status: 'error',
-            message: 'Token invalido',
-            error
+            message: 'Error en la autenticación'
         });
     }
-
-    //pasar a ejecucion de accion
-    next();
-}
+};
