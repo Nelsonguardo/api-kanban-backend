@@ -18,9 +18,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Importar rutas
 const userRoutes = require('./routes/user.routes');
+const boardRoutes = require('./routes/board.routes');
 
 // Usar rutas
 app.use('/api', userRoutes);
+app.use('/api', boardRoutes);
 
 // Ruta de prueba
 app.get('/test', (req, res) => {
