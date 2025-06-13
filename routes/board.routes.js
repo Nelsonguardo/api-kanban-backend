@@ -203,6 +203,78 @@ const check = require('../middleware/auth');
  *       404:
  *         description: Tablero no encontrado
  */
+//swagger para asignación de colaboradores
+/**
+ * @swagger
+ * /collaborator:
+ *   post:
+ *     summary: Asignar un colaborador a un tablero
+ *     tags: [Tableros]
+ *     security:
+ *       - jwtAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               boardId:
+ *                 type: integer
+ *                 description: ID del tablero al que se asigna el colaborador
+ *               userId:
+ *                 type: integer
+ *                 description: ID del usuario a asignar como colaborador
+ *     responses:
+ *       201:
+ *         description: Colaborador asignado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *       401:
+ *         description: No autorizado
+ */
+//swagger para eliminar colaborador
+/**
+ * @swagger
+ * /board/{boardId}/collaborator/{userId}:
+ *   delete:
+ *     summary: Eliminar un colaborador de un tablero
+ *     tags: [Tableros]
+ *     security:
+ *       - jwtAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: boardId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del tablero del que se eliminará el colaborador
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del usuario a eliminar como colaborador
+ *     responses:
+ *       200:
+ *         description: Colaborador eliminado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *       401:
+ *         description: No autorizado
+ */
 
 router.get('/boards', check.auth, boardController.getAllBoards);
 router.get('/board/:id', check.auth, boardController.getOneBoard);
