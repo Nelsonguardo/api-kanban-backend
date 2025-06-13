@@ -1,6 +1,7 @@
 const User = require('./user');
 const Board = require('./board');
 const BoardUser = require('./boardUser');
+const Column = require('./column');
 
 // Asociación: Un board pertenece a un usuario (owner)
 Board.belongsTo(User, {
@@ -29,8 +30,21 @@ Board.belongsToMany(User, {
     as: 'collaborators'
 });
 
+// Asociación: Un board tiene muchas columnas
+Board.hasMany(Column, {
+    foreignKey: 'board_id',
+    as: 'columns'
+});
+
+// Asociación: Una columna pertenece a un board
+Column.belongsTo(Board, {
+    foreignKey: 'board_id',
+    as: 'board'
+});
+
 module.exports = {
     User,
     Board,
-    BoardUser
+    BoardUser,
+    Column
 };
