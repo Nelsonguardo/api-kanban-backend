@@ -1,4 +1,4 @@
-const { User, Board, BoardUser } = require('../models');
+const { User, Board, BoardUser, Column, Task } = require('../models');
 
 class BoardService {
 
@@ -39,6 +39,25 @@ class BoardService {
                         as: 'collaborators',
                         attributes: ['id', 'name', 'email'],
                         through: { attributes: [] }
+                    },
+                    {
+                        model: Column,
+                        as: 'columns',
+                        attributes: ['id', 'name'],
+                        include: [
+                            {
+                                model: Task,
+                                as: 'tasks',
+                                attributes: ['id', 'title', 'description', 'priority'],
+                                include: [
+                                    {
+                                        model: User,
+                                        as: 'assignee',
+                                        attributes: ['id', 'name', 'email']
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ]
             });
