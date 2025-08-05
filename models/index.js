@@ -2,6 +2,7 @@ const User = require('./user');
 const Board = require('./board');
 const BoardUser = require('./boardUser');
 const Column = require('./column');
+const Task = require('./task');
 
 // Asociación: Un board pertenece a un usuario (owner)
 Board.belongsTo(User, {
@@ -23,6 +24,7 @@ User.belongsToMany(Board, {
     as: 'sharedBoards'
 });
 
+// Asociación Many-to-Many: Un board puede tener muchos colaboradores (usuarios) y un usuario puede colaborar en muchos boards
 Board.belongsToMany(User, {
     through: BoardUser,
     foreignKey: 'board_id',
@@ -42,9 +44,34 @@ Column.belongsTo(Board, {
     as: 'board'
 });
 
+// Asociación: Una columna tiene muchas tareas
+Column.hasMany(Task, {
+    foreignKey: 'column_id',
+    as: 'tasks'
+});
+
+// Asociación: Una tarea pertenece a una columna
+Task.belongsTo(Column, {
+    foreignKey: 'column_id',
+    as: 'column'
+});
+
+// Asociación: Una tarea puede ser asignada a un usuario
+Task.belongsTo(User, {
+    foreignKey: 'assignee_id',
+    as: 'assignee'
+});
+
+// Asociación: Un usuario puede tener muchas tareas asignadas
+User.hasMany(Task, {
+    foreignKey: 'assignee_id',
+    as: 'assignedTasks'
+});
+
 module.exports = {
     User,
     Board,
     BoardUser,
-    Column
+    Column,
+    Task
 };

@@ -1,4 +1,4 @@
-const Column = require('../models/column');
+const {Column, Task} = require('../models');
 
 async function createColumn(data) {
     try {
@@ -20,7 +20,17 @@ async function getColumnById(id) {
 
 async function getAllColumns() {
     try {
-        const columns = await Column.findAll();
+        const columns = await Column.findAll(
+            {
+                include: [
+                    {
+                        model:  Task,
+                        as: 'tasks',
+                        attributes: ['id', 'title', 'description', 'priority'],
+                    }
+                ]
+            }
+        );
         return columns;
     } catch (error) {
         throw error;
