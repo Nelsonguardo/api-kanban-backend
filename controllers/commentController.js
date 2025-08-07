@@ -73,6 +73,130 @@ class CommentController {
             });
         }
     }
+
+    // Get a single comment by ID
+    async getCommentById(req, res) {
+        try {
+            const { id } = req.params;
+            if (!id) {
+                return res.status(400).json({
+                    status: 'error',
+                    message: 'ID de comentario no proporcionado'
+                });
+            }
+            
+            const comment = await CommentService.getCommentById(id);
+            if (!comment) {
+                return res.status(404).json({
+                    status: 'error',
+                    message: 'Comentario no encontrado'
+                });
+            }
+            
+            return res.status(200).json({
+                status: 'success',
+                comment
+            });
+        } catch (error) {
+            return res.status(500).json({
+                status: 'error',
+                message: error.message
+            });
+        }
+    }
+
+    // Update a comment by ID
+    async updateComment(req, res) {
+        try {
+            const { id } = req.params;
+            const updateData = req.body;
+            
+            if (!id) {
+                return res.status(400).json({
+                    status: 'error',
+                    message: 'ID de comentario no proporcionado'
+                });
+            }
+            
+            if (!updateData.content) {
+                return res.status(400).json({
+                    status: 'error',
+                    message: 'Contenido del comentario es requerido'
+                });
+            }
+            
+            // Verificar que el comentario existe antes de actualizar
+            const existingComment = await CommentService.getCommentById(id);
+            if (!existingComment) {
+                return res.status(404).json({
+                    status: 'error',
+                    message: 'Comentario no encontrado'
+                });
+            }
+            
+            const updatedComment = await CommentService.updateComment(id, updateData);
+            return res.status(200).json({
+                status: 'success',
+                message: 'Comentario actualizado correctamente',
+                comment: updatedComment
+            });
+        } catch (error) {
+            return res.status(500).json({
+                status: 'error',
+                message: error.message
+            });
+        }
+    }
+
+    // Delete a comment by ID
+    async deleteComment(req, res) {
+        try {
+            const { id } = req.params;
+            
+            if (!id) {
+                return res.status(400).json({
+                    status: 'error',
+                    message: 'ID de comentario no proporcionado'
+                });
+            }
+            
+            // Verificar que el comentario existe antes de eliminar
+            const existingComment = await CommentService.getCommentById(id);
+            if (!existingComment) {
+                return res.status(404).json({
+                    status: 'error',
+                    message: 'Comentario no encontrado'
+                });
+            }
+            
+            await CommentService.deleteComment(id);
+            return res.status(200).json({
+                status: 'success',
+                message: 'Comentario eliminado correctamente'
+            });
+        } catch (error) {
+            return res.status(500).json({
+                status: 'error',
+                message: error.message
+            });
+        }
+    }
+
+    // Get all comments (optional)
+    async getAllComments(req, res) {
+        try {
+            const comments = await CommentService.getAllComments();
+            return res.status(200).json({
+                status: 'success',
+                comments
+            });
+        } catch (error) {
+            return res.status(500).json({
+                status: 'error',
+                message: error.message
+            });
+        }
+    }
 }
 
 module.exports = new CommentController();
