@@ -3,6 +3,7 @@ const Board = require('./board');
 const BoardUser = require('./boardUser');
 const Column = require('./column');
 const Task = require('./task');
+const Comment = require('./comment');
 
 // Asociación: Un board pertenece a un usuario (owner)
 Board.belongsTo(User, {
@@ -68,10 +69,36 @@ User.hasMany(Task, {
     as: 'assignedTasks'
 });
 
+// Asociación: Una tarea puede tener muchos comentarios
+Task.hasMany(Comment, {
+    foreignKey: 'task_id',
+    as: 'comments'
+});
+// Asociación: Un comentario pertenece a una tarea
+Comment.belongsTo(Task, {
+    foreignKey: 'task_id',
+    as: 'task'
+});
+
+// Asociación: Un comentario pertenece a un usuario
+Comment.belongsTo(User, {
+    foreignKey: 'user_id',
+    as: 'user'
+});
+
+// Asociación: Un usuario puede hacer muchos comentarios
+User.hasMany(Comment, {
+    foreignKey: 'user_id',
+    as: 'comments'
+});
+
+// Exportar modelos
+
 module.exports = {
     User,
     Board,
     BoardUser,
     Column,
-    Task
+    Task, 
+    Comment
 };

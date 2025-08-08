@@ -13,7 +13,12 @@ exports.auth = (req, res, next) => {
         }
 
         // Obtener el token y limpiar comillas si existen
-        const token = req.headers.authorization.replace(/['"]+/g, '');
+        let token = req.headers.authorization.replace(/['"]+/g, '');
+
+        // Si el token tiene el prefijo Bearer, quitarlo
+        if (token.startsWith('Bearer ')) {
+            token = token.slice(7).trim();
+        }
 
         try {
             // Decodificar token
