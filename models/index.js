@@ -4,6 +4,7 @@ const BoardUser = require('./boardUser');
 const Column = require('./column');
 const Task = require('./task');
 const Comment = require('./comment');
+const TaskTimeLog = require('./taskTimeLog');
 
 // Asociación: Un board pertenece a un usuario (owner)
 Board.belongsTo(User, {
@@ -92,6 +93,27 @@ User.hasMany(Comment, {
     as: 'comments'
 });
 
+// Relaciones para TaskTimeLog
+Task.hasMany(TaskTimeLog, {
+    foreignKey: 'task_id',
+    as: 'timeLogs'
+});
+
+TaskTimeLog.belongsTo(Task, {
+    foreignKey: 'task_id',
+    as: 'task'
+});
+
+User.hasMany(TaskTimeLog, {
+    foreignKey: 'user_id',
+    as: 'timeLogs'
+});
+
+TaskTimeLog.belongsTo(User, {
+    foreignKey: 'user_id',
+    as: 'user'
+});
+
 // Exportar modelos
 
 module.exports = {
@@ -100,5 +122,6 @@ module.exports = {
     BoardUser,
     Column,
     Task, 
-    Comment
+    Comment,
+    TaskTimeLog
 };
