@@ -8,6 +8,7 @@ const boardRoutes = require('./board.routes');
 const columnRoutes = require('./column.routes');
 const taskRoutes = require('./task.routes');
 const commentRoutes = require('./comment.routes');
+const taskTimeLogRoutes = require('./taskTimeLog.routes');
 
 // Setting up routes
 router.use(userRoutes);
@@ -15,6 +16,7 @@ router.use(boardRoutes);
 router.use(columnRoutes);
 router.use(taskRoutes);
 router.use(commentRoutes);
+router.use(taskTimeLogRoutes);
 
 // Export the router
 module.exports = router;
