@@ -136,6 +136,57 @@ class BoardService {
             throw new Error('Error al obtener los usuarios del tablero');
         }
     }
+
+    async getBoardByUsers(userId) {
+        try {
+            console.log('Obteniendo tableros para el usuario:', userId);
+
+            const boardUsers = await BoardUser.findAll({
+                where: {
+                    user_id: userId
+                },
+                include: [
+                    {
+                        model: Board,
+                        as: 'board',
+                        attributes: ['id', 'title', 'created_at'], // Elimina 'description'
+                        include: [
+                            {
+                                model: User,
+                                as: 'owner',
+                                attributes: ['id', 'name', 'email']
+                            },
+                            {
+                                model: User,
+                                as: 'collaborators',
+                                attributes: ['id', 'name', 'email'],
+                                through: { attributes: [] }
+                            }
+                        ]
+                    }
+                ]
+            });
+
+            //console.log('Tableros obtenidos:', boardUsers);
+            return boardUsers;
+        } catch (error) {
+            //console.error('Error en getBoardByUsers:', error);
+            throw new Error('Error al obtener los tableros del usuario');
+        }
+    }
+
+    async getBoardUsers(boardId) {
+        try {
+            const boardUsers = await BoardUser.findAll({
+                where: {
+                    board_id: boardId
+                }
+            });
+            return boardUsers;
+        } catch (error) {
+            throw new Error('Error al obtener los usuarios del tablero');
+        }
+    }
 }
 
 module.exports = new BoardService();

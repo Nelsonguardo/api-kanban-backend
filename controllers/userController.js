@@ -95,7 +95,7 @@ class UserController {
             // comprobar la password
             const pwd = bcrypt.compareSync(params.password, user.password);
             if (!pwd) {
-                return res.status(400).send({
+                return res.status(401).send({
                     status: "error",
                     message: "La password es incorrecta"
                 })
