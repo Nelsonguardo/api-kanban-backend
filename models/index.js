@@ -114,6 +114,16 @@ TaskTimeLog.belongsTo(User, {
     as: 'user'
 });
 
+BoardUser.belongsTo(Board, {
+    foreignKey: 'board_id',
+    as: 'board'
+});
+
+Board.hasMany(BoardUser, {
+    foreignKey: 'board_id',
+    as: 'boardUsers'
+});
+
 // Exportar modelos
 
 module.exports = {
@@ -121,7 +131,7 @@ module.exports = {
     Board,
     BoardUser,
     Column,
-    Task, 
+    Task,
     Comment,
     TaskTimeLog
 };

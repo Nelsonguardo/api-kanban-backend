@@ -272,6 +272,32 @@ class BoardController {
             });
         }
     }
+
+    async getBoardByUsers(req, res) {
+        try {
+            const { userId } = req.params;
+
+            // Validar que el ID del usuario existe
+            if (!userId) {
+                return res.status(400).json({
+                    status: 'error',
+                    message: 'ID de usuario no proporcionado'
+                });
+            }
+
+            const boards = await boardService.getBoardByUsers(userId);
+            return res.status(200).json({
+                status: 'success',
+                boards
+            });
+        } catch (error) {
+            return res.status(500).json({
+                status: 'error',
+                message: error.message
+            });
+        }
+    }
+
 }
 
 module.exports = new BoardController();

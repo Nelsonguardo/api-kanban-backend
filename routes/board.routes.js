@@ -286,5 +286,7 @@ router.delete('/board/:id', check.auth, boardController.deleteBoard);
 router.post('/collaborator', check.auth, boardController.createBoardUser);
 router.delete('/board/:boardId/collaborator/:userId', check.auth, boardController.deleteBoardUser);
 
+// Obtener tableros por usuario
+router.get('/board/:userId/users', check.auth, boardController.getBoardByUsers);
 
 module.exports = router;
